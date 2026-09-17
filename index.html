@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>⚡ Elite Challenge & Habit Suite</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ================= CSS DESIGN TOKENS (Dark & Light Sporty Glass) ================= */
+:root[data-theme="dark"]{
+  --bg:#070a14; --bg2:#0d1322; --card:#111b30; --card2:#172442;
+  --text:#f1f5f9; --text2:#94a3b8; --text3:#64748b;
+  --border:#1e293b; --border2:#334155;
+  --primary:#3b82f6; --primary2:#60a5fa;
+  --green:#10b981; --green2:#059669;
+  --red:#f43f5e; --amber:#f59e0b; --purple:#8b5cf6;
+  --cyan:#06b6d4; --pink:#ec4899; --scale:#14b8a6;
+  --neon-glow:0 0 25px rgba(59,130,246,.25);
+  --shadow:0 12px 35px -5px rgba(0,0,0,.5);
+  --header-grad:linear-gradient(135deg,#1e293b,#0f172a 60%,#070a14);
+}
+:root[data-theme="light"]{
+  --bg:#f1f5f9; --bg2:#e2e8f0; --card:#ffffff; --card2:#f8fafc;
+  --text:#0f172a; --text2:#475569; --text3:#94a3b8;
+  --border:#cbd5e1; --border2:#94a3b8;
+  --primary:#2563eb; --primary2:#3b82f6;
+  --green:#059669; --green2:#047857;
+  --red:#dc2626; --amber:#d97706; --purple:#7c3aed;
+  --cyan:#0891b2; --pink:#db2777; --scale:#0d9488;
+  --neon-glow:0 0 25px rgba(37,99,235,.15);
+  --shadow:0 12px 25px -5px rgba(0,0,0,.08);
+  --header-grad:linear-gradient(135deg,#e2e8f0,#f1f5f9 60%,#ffffff);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  background:var(--bg); color:var(--text); line-height:1.6; min-height:100vh;
+  padding-bottom:110px; transition:background .35s ease, color .35s ease;
+  overflow-x:hidden;
+}
+.wrap{max-width:540px;margin:0 auto;padding:12px}
+
+/* ================= MOBILE APP SHELL HEADER ================= */
+.hdr{
+  background:var(--header-grad);
+  border:1px solid var(--border2); border-radius:22px;
+  padding:18px 20px; display:flex; justify-content:space-between;
+  align-items:center; gap:12px; margin-bottom:12px;
+  box-shadow:var(--shadow); position:relative; overflow:hidden;
+  animation: slideDown .5s cubic-bezier(.16,1,.3,1);
+}
+@keyframes slideDown{from{opacity:0;transform:translateY(-15px)}to{opacity:1;transform:none}}
+.hdr h1{font-size:20px;font-weight:900;letter-spacing:-.5px;display:flex;align-items:center;gap:10px}
+.hdr h1 .emo{font-size:24px;background:rgba(128,128,128,.1);padding:5px;border-radius:10px}
+.hdr .dte{font-size:12px;color:var(--text2);margin-top:2px;font-weight:600}
+.hdr-stats{display:flex;gap:8px}
+.hstat{background:var(--card2);padding:7px 12px;border-radius:12px;font-size:12px;font-weight:700;border:1px solid var(--border);display:flex;align-items:center;gap:4px}
+.hstat b{color:var(--green)}
+
+/* ================= CONTROLS & UTILS ================= */
+.top-controls{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px}
+.daynav{
+  display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border);
+  border-radius:14px;padding:8px 10px;flex:1;box-shadow:var(--shadow)
+}
+.daynav input{flex:1;min-width:110px;padding:8px;border:1px solid var(--border);border-radius:10px;font-size:13px;background:var(--bg2);color:var(--text);font-family:inherit}
+.daynav button{padding:8px 12px;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:12px;background:var(--card2);color:var(--text);border:1px solid var(--border);font-family:inherit;transition:all .2s}
+.daynav button:hover{border-color:var(--primary);color:var(--primary2);transform:translateY(-1px)}
+.daynav .locked-hint{width:100%;font-size:11px;color:var(--amber);font-weight:600;display:flex;align-items:center;gap:4px}
+
+.util-controls{display:flex;gap:6px;align-items:center}
+.ctrl-btn{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:9px 12px;display:flex;align-items:center;gap:6px;cursor:pointer;box-shadow:var(--shadow);color:var(--text);font-weight:700;font-size:12px;font-family:inherit;transition:all .2s}
+.ctrl-btn:hover{transform:translateY(-2px);border-color:var(--primary)}
+.ctrl-btn select{background:var(--bg2);color:var(--text);border:1px solid var(--border);padding:4px 6px;border-radius:8px;font-weight:700;cursor:pointer;font-family:inherit}
+
+/* ================= FLOATING / FIXED BOTTOM NAVIGATION BAR ================= */
+.tabs{
+  display:flex;justify-content:space-around;align-items:center;padding:8px 6px calc(8px + env(safe-area-inset-bottom));
+  position:fixed;bottom:0;left:0;right:0;z-index:1000;
+  background:var(--card);background:rgba(var(--card-rgb),.92);backdrop-filter:blur(20px);
+  border-top:1px solid var(--border);border-radius:24px 24px 0 0;
+  box-shadow:0 -10px 30px rgba(0,0,0,.2);
+}
+.tab{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:transparent;border:none;padding:6px 2px;border-radius:14px;cursor:pointer;
+  color:var(--text3);font-size:10px;font-weight:700;transition:all .25s cubic-bezier(.16,1,.3,1);font-family:inherit;gap:3px;
+}
+.tab .ti{font-size:20px;transition:transform .2s}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--primary2);transform:translateY(-3px)}
+.tab.active .ti{transform:scale(1.2);filter:drop-shadow(0 0 8px rgba(59,130,246,.5))}
+
+/* ================= CARDS & COMPONENTS ================= */
+.pg{display:none}.pg.active{display:block;animation:fadeScale .3s cubic-bezier(.16,1,.3,1)}
+@keyframes fadeScale{from{opacity:0;transform:scale(.98) translateY(6px)}to{opacity:1;transform:none}}
+.card{
+  background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--border);border-radius:18px;padding:18px;margin-bottom:14px;box-shadow:var(--shadow);
+  transition:transform .25s cubic-bezier(.16,1,.3,1), border-color .25s;
+}
+.card:active{transform:scale(.99)}
+.ct{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:8px}
+.ct h3{font-size:15px;font-weight:800;display:flex;align-items:center;gap:7px;letter-spacing:-.2px}
+.btn{
+  padding:11px 16px;border:none;border-radius:12px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;
+  transition:all .2s cubic-bezier(.16,1,.3,1);border:1px solid transparent;display:inline-flex;align-items:center;justify-content:center;gap:6px
+}
+.btn:hover{transform:translateY(-2px);filter:brightness(1.1);box-shadow:0 6px 18px rgba(0,0,0,.2)}
+.btn:active{transform:scale(.97)}
+.b-green{background:var(--green);color:white}.b-blue{background:linear-gradient(135deg,var(--primary),var(--primary2));color:white}
+.b-red{background:var(--red);color:white}.b-amber{background:var(--amber);color:white}
+.b-purple{background:var(--purple);color:white}
+.b-ghost{background:var(--card);color:var(--text);border:1px solid var(--border)}
+.b-sm{padding:7px 12px;font-size:11.5px;border-radius:9px}
+
+input[type=text],input[type=number],input[type=date],select,textarea{
+  width:100%;padding:11px 13px;border:1px solid var(--border);border-radius:12px;font-size:13.5px;
+  background:var(--bg2);color:var(--text);font-family:inherit;transition:all .2s
+}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 4px rgba(59,130,246,.15)}
+input[type=range]{width:100%;accent-color:var(--primary);height:26px;cursor:pointer}
+input[type=color]{width:100%;height:42px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);padding:3px;cursor:pointer}
+label.fld{display:block;font-size:12px;font-weight:700;color:var(--text2);margin-bottom:5px}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mt{margin-top:12px}.mb{margin-bottom:10px}.center{text-align:center}
+.hint{font-size:12px;color:var(--text3)}
+.pbar{width:100%;height:10px;background:var(--bg2);border-radius:6px;overflow:hidden;border:1px solid var(--border)}
+.pfill{height:100%;border-radius:6px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.chip{padding:3px 10px;border-radius:16px;font-weight:700;font-size:11px;display:inline-flex;align-items:center;gap:4px}
+.streaks{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.sbadge{padding:8px 14px;border-radius:12px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px;box-shadow:var(--shadow)}
+
+/* ================= HOME & GOALS ================= */
+.overall{background:linear-gradient(135deg,var(--card),var(--card2));border:1px solid var(--border2);border-radius:20px;padding:20px;margin-bottom:14px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.overall .row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.overall .row .big-pct{font-size:32px;font-weight:900;background:linear-gradient(135deg,var(--green),var(--cyan));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.obg{width:100%;height:14px;background:var(--bg2);border-radius:8px;overflow:hidden;border:1px solid var(--border)}
+.ofill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--green),var(--cyan));transition:width .5s cubic-bezier(.4,0,.2,1)}
+
+.gcard{
+  border-left:4px solid var(--primary);border-radius:16px;padding:16px;margin-bottom:12px;background:linear-gradient(180deg,var(--card),var(--card2));
+  border:1px solid var(--border);border-left-width:4px;box-shadow:var(--shadow);transition:transform .2s;
+}
+.gcard:active{transform:scale(.99)}
+[dir="rtl"] .gcard{border-left-width:1px;border-right-width:4px;border-right-color:var(--primary);border-left-color:var(--border)}
+.gcard .ghead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:8px;flex-wrap:wrap}
+.gcard .ghead .name{font-weight:800;font-size:15px;display:flex;align-items:center;gap:8px}
+.gcard .ghead .val{font-weight:900;font-size:17px}
+.gmeta{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;font-size:12px}
+
+.gstat-btn{padding:11px 16px;border:2px solid var(--border);border-radius:12px;font-weight:800;cursor:pointer;font-size:13.5px;background:var(--card);color:var(--text);font-family:inherit;transition:all .2s;flex:1}
+.gstat-btn:active{transform:scale(.97)}
+.gstat-btn.sel-done{background:var(--green);border-color:var(--green);color:white;box-shadow:0 0 15px rgba(16,185,129,.35)}
+.gstat-btn.sel-rest{background:var(--primary);border-color:var(--primary);color:white;box-shadow:0 0 15px rgba(59,130,246,.35)}
+.gstat-btn.sel-missed{background:var(--red);border-color:var(--red);color:white}
+
+/* ================= PRAYER & QURAN ================= */
+.pgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(84px,1fr));gap:8px}
+.pcard{border:2px solid var(--border);border-radius:14px;padding:12px 8px;text-align:center;cursor:pointer;transition:all .2s cubic-bezier(.16,1,.3,1);background:var(--card2)}
+.pcard:active{transform:scale(.95)}
+.pcard .pi{font-size:24px}.pcard .pn{font-weight:700;font-size:12.5px;margin-top:5px}
+.pcard.done{background:linear-gradient(135deg,var(--green),var(--green2));border-color:var(--green);color:white;box-shadow:0 6px 18px rgba(16,185,129,.35)}
+.pcard.readonly{opacity:.8;cursor:default}
+
+/* ================= GYM / WORKOUTS ================= */
+.excard{border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:12px;background:linear-gradient(180deg,var(--card),var(--card2));box-shadow:var(--shadow)}
+.exhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px}
+.exthumb{width:50px;height:50px;border-radius:12px;object-fit:cover;border:1px solid var(--border2);flex-shrink:0;background:var(--bg2)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:8px 4px;text-align:center;border-bottom:1px solid var(--border)}
+th{color:var(--text2);font-size:11.5px;font-weight:800}
+.setedit{width:58px;padding:6px;border:1px solid var(--border);border-radius:8px;text-align:center;font-size:13px;background:var(--bg2);color:var(--text)}
+.minibtn{padding:6px 10px;border:none;border-radius:8px;cursor:pointer;font-weight:800;font-size:11px;background:var(--card2);color:var(--text);border:1px solid var(--border)}
+.minibtn:active{transform:scale(.95)}
+.minibtn.g{background:var(--green);color:white;border-color:transparent}.minibtn.r{background:var(--red);color:white;border-color:transparent}
+.minibtn.b{background:var(--primary);color:white;border-color:transparent}
+.librow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 13px;border:1px solid var(--border);border-radius:13px;margin-bottom:8px;background:var(--card)}
+.mfilters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.filter-btn{padding:7px 12px;border:none;border-radius:9px;font-weight:700;font-size:12px;cursor:pointer;background:var(--card2);color:var(--text2);font-family:inherit;border:1px solid var(--border)}
+.filter-btn.active{background:var(--primary);color:white;border-color:var(--primary);box-shadow:var(--neon-glow)}
+
+/* ================= CALENDAR & STATS ================= */
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.cal-h{text-align:center;font-size:11.5px;font-weight:800;color:var(--text3);padding:4px}
+.cal-day{aspect-ratio:1;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:12px;font-weight:800;cursor:pointer;background:var(--card2);color:var(--text3);transition:all .15s}
+.cal-day:active{transform:scale(.9)}
+.cal-day.today{box-shadow:0 0 0 2px var(--amber)}
+.cal-day .pct{font-size:8.5px;opacity:.95;margin-top:1px}
+.cal-day.future{opacity:.3;cursor:not-allowed}
+.cal-day.before{opacity:.35}
+.bars{display:flex;align-items:flex-end;gap:8px;height:160px;padding:6px;overflow-x:auto}
+.bar-col{flex:1;min-width:24px;display:flex;flex-direction:column;align-items:center;gap:5px}
+.bar{width:100%;border-radius:6px 6px 0 0;min-height:4px;transition:height .5s cubic-bezier(.4,0,.2,1)}
+.bar-l{font-size:10.5px;color:var(--text2);font-weight:700;white-space:nowrap}
+.rgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.rcard{text-align:center;padding:16px;border:1px solid var(--border);border-radius:16px;background:linear-gradient(180deg,var(--card2),var(--card));box-shadow:var(--shadow)}
+.rcard .rv{font-size:24px;font-weight:900;color:var(--primary);letter-spacing:-.5px}
+.rcard .rl{font-size:12px;color:var(--text3);margin-top:3px}
+.badge-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.badge{border:2px solid var(--border);border-radius:15px;padding:14px 6px;text-align:center;background:var(--card);opacity:.35;transition:all .25s}
+.badge.earned{opacity:1;border-color:var(--amber);background:linear-gradient(180deg,rgba(245,158,11,.15),rgba(245,158,11,.04));box-shadow:0 0 18px rgba(245,158,11,.2)}
+.badge .bi{font-size:28px}.badge .bn{font-size:11px;font-weight:800;margin-top:5px}
+
+/* ================= NUTRITION ================= */
+.meal-card{border:1px solid var(--border);border-radius:15px;padding:15px;margin-bottom:11px;background:linear-gradient(180deg,var(--card),var(--card2));box-shadow:var(--shadow)}
+.cal-ring{width:110px;height:110px;position:relative;margin:0 auto}
+.cal-ring svg{transform:rotate(-90deg)}
+.cal-ring .cal-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:900}
+
+/* ================= TOAST ================= */
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-30px);background:linear-gradient(135deg,var(--primary),var(--primary2));color:white;padding:12px 24px;border-radius:14px;font-size:13.5px;font-weight:800;opacity:0;pointer-events:none;transition:all .3s cubic-bezier(.4,0,.2,1);z-index:2000;box-shadow:0 10px 25px rgba(0,0,0,.3)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="hdr">
+    <div>
+      <h1><span class="emo">⚡</span> <span id="challenge-name">Challenge Suite</span></h1>
+      <div class="dte" id="hdr-date"></div>
+    </div>
+    <div class="hdr-stats">
+      <div class="hstat">🔥 <b id="h-mainstreak">0</b></div>
+      <div class="hstat">🎯 <b id="h-score">0%</b></div>
+    </div>
+  </div>
+
+  <!-- TOP CONTROLS: DATE, THEME & LANGUAGE -->
+  <div class="top-controls">
+    <div class="daynav">
+      <button onclick="shiftDate(-1)">◀</button>
+      <input type="date" id="date-picker" onchange="onDateChange(this.value)">
+      <button onclick="shiftDate(1)">▶</button>
+      <button onclick="setToday()" class="b-green" data-i18n="today_btn">Today</button>
+      <div class="locked-hint hidden" id="date-lock-hint">🔒 Read only</div>
+    </div>
+    <div class="util-controls">
+      <button class="ctrl-btn" onclick="toggleTheme()" id="theme-toggle-btn" title="Toggle Theme">🌙</button>
+      <div class="ctrl-btn">
+        <span>🌐</span>
+        <select id="lang-select" onchange="changeLanguage(this.value)">
+          <option value="en" selected>EN</option>
+          <option value="ar">AR</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- FIXED BOTTOM MOBILE APP NAVIGATION -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('home')"><span class="ti">🏠</span><span data-i18n="tab_home">Home</span></button>
+    <button class="tab" onclick="switchTab('prayer')"><span class="ti">🕌</span><span data-i18n="tab_prayer">Prayer</span></button>
+    <button class="tab" onclick="switchTab('quran')"><span class="ti">📖</span><span data-i18n="tab_quran">Quran</span></button>
+    <button class="tab" onclick="switchTab('daily')"><span class="ti">🎯</span><span data-i18n="tab_daily">Daily</span></button>
+    <button class="tab" onclick="switchTab('gym')"><span class="ti">💪</span><span data-i18n="tab_gym">Gym</span></button>
+    <button class="tab" onclick="switchTab('nutrition')"><span class="ti">🍽</span><span data-i18n="tab_nutrition">Diet</span></button>
+    <button class="tab" onclick="switchTab('scale')"><span class="ti">⚖️</span><span data-i18n="tab_scale">Weight</span></button>
+    <button class="tab" onclick="switchTab('stats')"><span class="ti">📊</span><span data-i18n="tab_stats">Stats</span></button>
+    <button class="tab" onclick="switchTab('settings')"><span class="ti">⚙️</span><span data-i18n="tab_settings">Settings</span></button>
+  </div>
+
+  <!-- STREAKS -->
+  <div class="streaks" id="streak-row"></div>
+
+  <!-- ============ HOME ============ -->
+  <div class="pg active" id="pg-home">
+    <div class="overall">
+      <div class="row"><span style="font-weight:800" data-i18n="overall_today">Daily Completion</span><span class="big-pct" id="today-score">0%</span></div>
+      <div class="obg"><div class="ofill" id="today-bar"></div></div>
+      <div class="gmeta" id="home-deadline-info"></div>
+    </div>
+    <div id="home-cards"></div>
+  </div>
+
+  <!-- ============ PRAYER ============ -->
+  <div class="pg" id="pg-prayer">
+    <div class="card">
+      <div class="ct"><h3 data-i18n="prayer_today">🕌 Today's Prayers</h3><b id="prayer-val" style="color:var(--green);font-size:21px">0/5</b></div>
+      <div class="pbar mb"><div class="pfill" id="prayer-bar" style="width:0%;background:var(--green)"></div></div>
+      <div class="pgrid" id="prayer-grid"></div>
+    </div>
+    <div class="card">
+      <div class="ct"><h3 data-i18n="prayer_week">📅 This Week</h3></div>
+      <div class="pgrid" id="prayer-week"></div>
+    </div>
+  </div>
+
+  <!-- ============ QURAN ============ -->
+  <div class="pg" id="pg-quran">
+    <div class="card">
+      <div class="ct"><h3 data-i18n="quran_title">📖 Quran Reading</h3><b id="quran-val" style="color:var(--primary);font-size:21px">0</b></div>
+      <label class="fld" data-i18n="quran_pages_lbl">Number of Pages</label>
+      <input type="number" min="0" step="1" id="quran-pages" placeholder="e.g. 3">
+      <label class="fld mt" data-i18n="quran_type_lbl">Reading Type</label>
+      <div style="display:flex;gap:8px">
+        <button class="btn b-sm b-blue" style="flex:1" id="quran-new" onclick="setQuranType('new')" data-i18n="quran_new">🆕 New</button>
+        <button class="btn b-sm b-ghost" style="flex:1" id="quran-review" onclick="setQuranType('review')" data-i18n="quran_review">🔁 Review</button>
+      </div>
+      <button class="btn b-green mt" style="width:100%" onclick="saveQuran()" data-i18n="save_add">➕ Save Pages</button>
+    </div>
+    <div class="card">
+      <div class="ct"><h3 data-i18n="quran_month">📈 This Month</h3></div>
+      <div class="bars" id="quran-chart"></div>
+    </div>
+  </div>
+
+  <!-- ============ DAILY ============ -->
+  <div class="pg" id="pg-daily">
+    <div class="card">
+      <div class="ct"><h3 data-i18n="daily_tasks">🎯 Daily Habits & Goals</h3></div>
+      <div id="daily-goals"></div>
+    </div>
+    <div class="card">
+      <div class="ct"><h3 data-i18n="daily_notes_title">📝 Daily Notes</h3></div>
+      <textarea id="daily-notes" rows="3" placeholder="Reflections or notes for today..."></textarea>
+      <button class="btn b-blue mt" style="width:100%" onclick="saveNotes()" data-i18n="save_day">✓ Save Day Notes</button>
+    </div>
+  </div>
+
+  <!-- ============ GYM ============ -->
+  <div class="pg" id="pg-gym">
+    <div class="card">
+      <div class="ct"><h3 data-i18n="gym_status_title">📅 Today's Status</h3></div>
+      <div class="gmeta mb" id="gym-schedule-info"></div>
+      <div class="gstatus" style="display:flex;gap:8px">
+        <button class="gstat-btn" id="gst-done" onclick="setGymStatus('done')" data-i18n="gym_done">✅ Workout</button>
+        <button class="gstat-btn" id="gst-rest" onclick="setGymStatus('rest')" data-i18n="gym_rest">💤 Rest</button>
+        <button class="gstat-btn" id="gst-missed" onclick="setGymStatus('missed')" data-i18n="gym_missed">❌ Missed</button>
+      </div>
+    </div>
+    <div class="card hidden" id="gym-setup-card">
+      <div class="ct"><h3 data-i18n="gym_data_title">📋 Workout Session</h3></div>
+      <div class="grid2">
+        <div><label class="fld" data-i18n="program_label">Routine</label><select id="prog-select" onchange="loadProgramForDay(this.value)"></select></div>
+        <div><label class="fld" data-i18n="workout_name_lbl">Title</label><input type="text" id="gym-day-name" placeholder="Push Day"></div>
+      </div>
+      <button class="btn b-ghost mt" onclick="addGymExerciseCurrent()" data-i18n="add_ex_lib">➕ Add Exercise from Library</button>
+    </div>
+    <div id="gym-exercises"></div>
+    <div class="card hidden" id="gym-save-card">
+      <button class="btn b-green" style="width:100%" onclick="saveGymDay()" data-i18n="save_workout_day">💾 Save Workout Session</button>
+    </div>
+    <div class="card hidden" id="gym-compare">
+      <div class="ct"><h3 data-i18n="gym_compare_title">📊 Weekly Comparison</h3></div>
+      <div id="gym-compare-body"></div>
+    </div>
+  </div>
+
+  <!-- ============ NUTRITION ============ -->
+  <div class="pg" id="pg-nutrition">
+    <div class="card">
+      <div class="ct"><h3 data-i18n="nutrition_cal_title">🔥 Calorie Intake</h3></div>
+      <div class="cal-ring">
+        <svg width="110" height="110">
+          <circle cx="55" cy="55" r="46" stroke="var(--bg2)" stroke-width="10" fill="none"/>
+          <circle id="cal-ring-fill" cx="55" cy="55" r="46" stroke="var(--pink)" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="289" stroke-dashoffset="289"/>
+        </svg>
+        <div class="cal-num"><span id="cal-eaten" style="font-size:20px">0</span><span id="cal-target" style="font-size:11px;color:var(--text3)">/ 0 kcal</span></div>
+      </div>
+      <div class="grid3 mt">
+        <div class="rcard"><div class="rv" id="macro-p" style="color:var(--pink)">0g</div><div class="rl" data-i18n="protein">Protein</div></div>
+        <div class="rcard"><div class="rv" id="macro-c" style="color:var(--amber)">0g</div><div class="rl" data-i18n="carbs">Carbs</div></div>
+        <div class="rcard"><div class="rv" id="macro-f" style="color:var(--cyan)">0g</div><div class="rl" data-i18n="fats">Fats</div></div>
+      </div>
+      <label class="fld mt" data-i18n="cal_limit_lbl">Daily Calorie Target</label>
+      <input type="number" id="cal-limit" placeholder="2000" onchange="setCalLimit(this.value)">
+    </div>
+    <div class="card">
+      <div class="ct"><h3 data-i18n="meals_title">🍽 Meals</h3><button class="btn b-ghost b-sm" onclick="addMeal()" data-i18n="add_meal">➕ Add Meal</button></div>
+      <div id="meals-list"></div>
+    </div>
+  </div>
+
+  <!-- ============ SCALE ============ -->
+  <div class="pg" id="pg-scale">
+    <div class="card">
+      <div class="ct"><h3 data-i18n="scale_title">⚖️ Body Weight</h3><b id="scale-val" style="color:var(--scale);font-size:22px">—</b></div>
+      <label class="fld" data-i18n="current_weight_lbl">Current Weight (kg)</label>
+      <input type="number" step="0.1" id="scale-input" placeholder="78.5">
+      <div class="grid2 mt">
+        <div><label class="fld" data-i18n="target_weight_lbl">🎯 Goal (kg)</label><input type="number" step="0.1" id="scale-goal" placeholder="75"></div>
+        <div><label class="fld" data-i18n="challenge_duration_lbl">📅 Days</label><input type="number" min="1" id="scale-days" placeholder="90"></div>
+      </div>
+      <div class="mt" id="scale-progress"></div>
+      <button class="btn b-green mt" style="width:100%" onclick="saveScale()" data-i18n="save_weight">💾 Save Weight</button>
+    </div>
+    <div class="card">
+      <div class="ct"><h3 data-i18n="weight_curve_title">📈 Trend</h3></div>
+      <div class="bars" id="scale-chart"></div>
+    </div>
+  </div>
+
+  <!-- ============ STATS ============ -->
+  <div class="pg" id="pg-stats">
+    <div class="card">
+      <div class="ct"><h3 data-i18n="calendar_title">📅 Calendar</h3><b><button onclick="shiftCal(-1)" class="btn b-ghost b-sm">◀</button> <span id="cal-month"></span> <button onclick="shiftCal(1)" class="btn b-ghost b-sm">▶</button></b></div>
+      <div class="cal" id="cal-grid"></div>
+    </div>
+    <div class="card">
+      <div class="ct"><h3 data-i18n="general_stats_title">📊 Analytics</h3></div>
+      <div class="rgrid" id="report-grid"></div>
+    </div>
+    <div class="card">
+      <div class="ct"><h3 data-i18n="achievements_title">🏆 Badges</h3></div>
+      <div class="badge-grid" id="badges-grid"></div>
+    </div>
+  </div>
+
+  <!-- ============ SETTINGS ============ -->
+  <div class="pg" id="pg-settings">
+    <div class="card">
+      <div class="ct"><h3 data-i18n="challenge_settings">🧭 Challenge Setup</h3></div>
+      <div class="grid2">
+        <div><label class="fld" data-i18n="ch_name_lbl">Title</label><input type="text" id="ch-name" onchange="setChallengeName(this.value)"></div>
+        <div><label class="fld" data-i18n="ch_days_lbl">Duration</label><input type="number" min="1" id="ch-days" onchange="setChallengeDays(this.value)"></div>
+        <div style="grid-column:1/-1"><label class="fld" data-i18n="ch_start_lbl">Start Date</label><input type="date" id="ch-start" onchange="setChallengeStart(this.value)"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ct"><h3 data-i18n="add_new_goal">➕ Add Custom Habit</h3></div>
+      <div class="grid2 mb">
+        <div><label class="fld" data-i18n="goal_name_lbl">Name</label><input type="text" id="ng-name" placeholder="Deep Work"></div>
+        <div><label class="fld" data-i18n="goal_type_lbl">Type</label><select id="ng-type" onchange="onGoalTypeChange()">
+          <option value="slider" data-i18n="type_numeric">Numeric</option>
+          <option value="toggle" data-i18n="type_yesno">Yes/No</option>
+          <option value="list" data-i18n="type_sublist">Sub-list</option>
+        </select></div>
+        <div><label class="fld" data-i18n="base_target_lbl">Target</label><input type="number" id="ng-target" placeholder="3"></div>
+        <div><label class="fld" data-i18n="unit_lbl">Unit</label><input type="text" id="ng-unit" placeholder="hours"></div>
+        <div><label class="fld" data-i18n="weight_lbl">Weight</label><input type="number" id="ng-weight" value="1" min="0.1" step="0.1"></div>
+        <div><label class="fld" data-i18n="color_lbl">Color</label><input type="color" id="ng-color" value="#3b82f6"></div>
+      </div>
+      <button class="btn b-green" onclick="addGoal()" data-i18n="add_goal_btn">➕ Add Goal</button>
+    </div>
+
+    <div class="card">
+      <div class="ct"><h3 data-i18n="current_goals_title">🎯 Active Goals</h3></div>
+      <div id="goals-list"></div>
+    </div>
+
+    <div class="card">
+      <div class="ct"><h3 data-i18n="exercise_library_title">💪 Exercise Library</h3></div>
+      <div class="grid2 mb">
+        <div><label class="fld" data-i18n="ex_name_lbl">Exercise</label><input type="text" id="new-ex-name" placeholder="Bench Press"></div>
+        <div><label class="fld" data-i18n="muscle_lbl">Muscle</label><select id="new-ex-muscle"></select></div>
+      </div>
+      <button class="btn b-blue" onclick="addExerciseToLibrary()" data-i18n="add_to_library">➕ Add Exercise</button>
+      <div class="mt"><div class="mfilters" id="muscle-filters"></div><div id="library-list"></div></div>
+    </div>
+
+    <div class="card">
+      <div class="ct"><h3 data-i18n="data_management">💾 Data Management</h3></div>
+      <div class="grid2">
+        <button class="btn b-blue" onclick="exportJSON()" data-i18n="export_json">📤 Export Backup</button>
+        <label class="btn b-green center" style="cursor:pointer"><span data-i18n="import_json">📥 Import Backup</span><input type="file" id="import-file" accept=".json" class="hidden" onchange="importJSON(this)"></label>
+        <button class="btn b-red" onclick="resetAll()" data-i18n="reset_all">🗑️ Wipe All</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script>
+/* ================= TRANSLATIONS (EN Default & AR) ================= */
+const i18n = {
+  en: {
+    challenge_name_default: "Challenge Suite",
+    today_btn: "Today",
+    tab_home: "Home", tab_prayer: "Prayer", tab_quran: "Quran", tab_daily: "Daily",
+    tab_gym: "Gym", tab_nutrition: "Diet", tab_scale: "Weight", tab_stats: "Stats", tab_settings: "Settings",
+    overall_today: "Daily Completion",
+    prayer_today: "Today's Prayers", prayer_week: "This Week",
+    quran_title: "Quran Reading", quran_pages_lbl: "Number of Pages", quran_type_lbl: "Reading Type",
+    quran_new: "🆕 New", quran_review: "🔁 Review", save_add: "➕ Save Pages", quran_month: "📈 This Month",
+    daily_tasks: "🎯 Daily Habits & Goals", daily_notes_title: "📝 Daily Notes", save_day: "✓ Save Day Notes",
+    gym_status_title: "📅 Today's Status",
+    gym_done: "✅ Workout", gym_rest: "💤 Rest", gym_missed: "❌ Missed",
+    gym_data_title: "📋 Workout Session", program_label: "Routine",
+    workout_name_lbl: "Title", target_muscles_lbl: "Target Muscles", add_ex_lib: "➕ Add Exercise from Library",
+    save_workout_day: "💾 Save Workout Session", gym_compare_title: "📊 Weekly Comparison",
+    nutrition_cal_title: "🔥 Calorie Intake", protein: "Protein", carbs: "Carbs", fats: "Fats",
+    cal_limit_lbl: "Daily Calorie Target", meals_title: "🍽 Meals", add_meal: "➕ Add Meal",
+    scale_title: "⚖️ Body Weight", current_weight_lbl: "Current Weight (kg)", target_weight_lbl: "🎯 Goal (kg)",
+    challenge_duration_lbl: "📅 Days", save_weight: "💾 Save Weight", weight_curve_title: "📈 Trend",
+    calendar_title: "📅 Calendar", general_stats_title: "📊 Analytics", achievements_title: "🏆 Badges",
+    challenge_settings: "🧭 Challenge Setup", ch_name_lbl: "Title", ch_days_lbl: "Duration", ch_start_lbl: "Start Date",
+    add_new_goal: "➕ Add Custom Habit", goal_name_lbl: "Name", goal_type_lbl: "Type",
+    type_numeric: "Numeric", type_yesno: "Yes/No", type_sublist: "Sub-list",
+    base_target_lbl: "Target", unit_lbl: "Unit", weight_lbl: "Weight", color_lbl: "Color",
+    add_goal_btn: "➕ Add Goal", current_goals_title: "🎯 Active Goals",
+    exercise_library_title: "💪 Exercise Library", ex_name_lbl: "Exercise", muscle_lbl: "Muscle",
+    add_to_library: "➕ Add Exercise", data_management: "💾 Data Management",
+    export_json: "📤 Export Backup", import_json: "📥 Import Backup", reset_all: "🗑️ Wipe All",
+    lock_past: "🔒 Read only past day", lock_future: "⏳ Future day locked", lock_before: "🔒 Before challenge start"
+  },
+  ar: {
+    challenge_name_default: "تحدّيي",
+    today_btn: "اليوم",
+    tab_home: "الرئيسية", tab_prayer: "الصلاة", tab_quran: "الورد", tab_daily: "اليومية",
+    tab_gym: "الجيم", tab_nutrition: "التغذية", tab_scale: "الميزان", tab_stats: "إحصائيات", tab_settings: "إعدادات",
+    overall_today: "نسبة الإنجاز",
+    prayer_today: "صلوات اليوم", prayer_week: "هذا الأسبوع",
+    quran_title: "ورد القرآن", quran_pages_lbl: "عدد الصفحات", quran_type_lbl: "نوع القراءة",
+    quran_new: "🆕 جديد", quran_review: "🔁 مراجعة", save_add: "➕ حفظ الصفحات", quran_month: "📈 هذا الشهر",
+    daily_tasks: "🎯 مهام وعادات اليوم", daily_notes_title: "📝 ملاحظات اليوم", save_day: "✓ حفظ الملاحظات",
+    gym_status_title: "📅 حالة اليوم",
+    gym_done: "✅ تدريب", gym_rest: "💤 راحة", gym_missed: "❌ ما تدربتش",
+    gym_data_title: "📋 بيانات التدريب", program_label: "البرنامج",
+    workout_name_lbl: "العنوان", target_muscles_lbl: "العضلات", add_ex_lib: "➕ إضافة تمرين من المكتبة",
+    save_workout_day: "💾 حفظ التمرين", gym_compare_title: "📊 مقارنة أسبوعية",
+    nutrition_cal_title: "🔥 السعرات الحرارية", protein: "بروتين", carbs: "كربوهيدرات", fats: "دهون",
+    cal_limit_lbl: "الهدف اليومي للسعرات", meals_title: "🍽 الوجبات", add_meal: "➕ إضافة وجبة",
+    scale_title: "⚖️ الوزن", current_weight_lbl: "الوزن الحالي (كجم)", target_weight_lbl: "🎯 الهدف (كجم)",
+    challenge_duration_lbl: "📅 أيام", save_weight: "💾 حفظ الوزن", weight_curve_title: "📈 المنحنى",
+    calendar_title: "📅 التقويم", general_stats_title: "📊 إحصائيات", achievements_title: "🏆 الأوسمة",
+    challenge_settings: "🧭 إعدادات التحدي", ch_name_lbl: "العنوان", ch_days_lbl: "المدة", ch_start_lbl: "تاريخ البدء",
+    add_new_goal: "➕ إضافة عادة", goal_name_lbl: "الاسم", goal_type_lbl: "النوع",
+    type_numeric: "رقمي", type_yesno: "نعم/لا", type_sublist: "قائمة فرعية",
+    base_target_lbl: "الهدف", unit_lbl: "الوحدة", weight_lbl: "الوزن", color_lbl: "اللون",
+    add_goal_btn: "➕ إضافة الهدف", current_goals_title: "🎯 الأهداف النشطة",
+    exercise_library_title: "💪 مكتبة التمارين", ex_name_lbl: "التمرين", muscle_lbl: "العضلة",
+    add_to_library: "➕ إضافة تمرين", data_management: "💾 إدارة البيانات",
+    export_json: "📤 تصدير نسخة", import_json: "📥 استيراد نسخة", reset_all: "🗑️ مسح الكل",
+    lock_past: "🔒 يوم قديم للعرض فقط", lock_future: "⏳ يوم مستقبلي مقفل", lock_before: "🔒 قبل بدء التحدي"
+  }
+};
+let currentLang = 'en';
+let currentTheme = 'dark';
+function t(key){return (i18n[currentLang] && i18n[currentLang][key]) || i18n['en'][key] || key;}
+function updateTexts(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(k)el.textContent=t(k);});
+  document.documentElement.lang = currentLang;
+  document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+}
+function changeLanguage(lang){currentLang = lang; save(); updateTexts(); renderAll();}
+function toggleTheme(){
+  currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', currentTheme);
+  el('theme-toggle-btn').textContent = currentTheme === 'dark' ? '🌙' : '☀️';
+  save();
+}
+
+/* ================= CONSTANTS ================= */
+const PRAYERS=[{id:'fajr',name:{en:'Fajr',ar:'الفجر'},icon:'🌅'},{id:'dhuhr',name:{en:'Dhuhr',ar:'الظهر'},icon:'☀️'},{id:'asr',name:{en:'Asr',ar:'العصر'},icon:'🌤️'},{id:'maghrib',name:{en:'Maghrib',ar:'المغرب'},icon:'🌇'},{id:'isha',name:{en:'Isha',ar:'العشاء'},icon:'🌙'}];
+const MUSCLES=['Chest','Back','Shoulders','Triceps','Biceps','Legs','Abs'];
+const WEEK_EN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const WEEK_AR=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+const DEFAULT_LIBRARY=[
+  ['Bar Bench Press','Chest'],['Incline Bench Press','Chest'],['Deadlift','Back'],['Pull-ups','Back'],
+  ['Overhead Press','Shoulders'],['Lateral Raises','Shoulders'],['Tricep Pushdowns','Triceps'],
+  ['Barbell Curl','Biceps'],['Squat','Legs'],['Leg Press','Legs'],['Crunches','Abs'],['Plank','Abs']
+];
+const state={currentDate:new Date(),tab:'home',calOffset:0,libraryFilter:'All'};
+let profiles=[],currentProfileIdx=0;
+
+/* ================= HELPERS ================= */
+function dateStr(d){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');return y+'-'+m+'-'+dd;}
+function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x;}
+function todayStr(){return dateStr(new Date());}
+function curStr(){return dateStr(state.currentDate);}
+function getProfile(){return profiles[currentProfileIdx];}
+function getDay(){const s=curStr();const p=getProfile();if(!p.data[s])p.data[s]=emptyDay();return p.data[s];}
+function emptyDay(){return{prayers:{fajr:false,dhuhr:false,asr:false,maghrib:false,isha:false},quran:{pages:0,type:'new',added:false},study:0,english:0,skill:0,weight:null,scaleGoal:null,scaleDays:null,notes:'',gym:{status:'',name:'',muscles:'',saved:false,workout:'',exercises:[]},meals:[],custom:{}};}
+function fmtDate(d){return d.toLocaleDateString(currentLang==='ar'?'ar-EG':'en-US',{weekday:'short',month:'short',day:'numeric'});}
+function padProg(v,t){return Math.min(100,Math.round((v/t)*100));}
+function el(id){return document.getElementById(id);}
+function esc(s){return String(s==null?'':s).replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+/* ================= DATE LOCKING ================= */
+function challenge(){const p=getProfile();return p.challenge||{name:'Challenge Suite',days:90,start:null};}
+function isEditable(ds){
+  const ch=challenge();
+  if(ch.start && ds < ch.start) return false;
+  if(ds > todayStr()) return false;
+  return true;
+}
+function isReadOnly(ds){return !isEditable(ds);}
+function dateIsPast(ds){return ds < todayStr();}
+function updateDateLockUI(){
+  const ds=curStr(); const readOnly=isReadOnly(ds);
+  const hint=el('date-lock-hint');
+  if(readOnly){
+    hint.classList.remove('hidden');
+    if(dateIsPast(ds)) hint.textContent=t('lock_past');
+    else if(ds>todayStr()) hint.textContent=t('lock_future');
+    else hint.textContent=t('lock_before');
+  } else hint.classList.add('hidden');
+  return readOnly;
+}
+function shiftDate(n){
+  const ch=challenge(); const target=addDays(state.currentDate,n); const tds=dateStr(target);
+  if(ch.start && tds < ch.start){ showToast(currentLang==='ar'?'🔒 قبل البدء':'🔒 Before start'); return; }
+  if(tds > todayStr()){ showToast(currentLang==='ar'?'⏳ يوم مستقبلي':'⏳ Future date'); return; }
+  state.currentDate=target; renderAll();
+}
+function onDateChange(v){
+  if(!v)return;
+  const ch=challenge();
+  if(ch.start && v < ch.start){ el('date-picker').value=curStr(); return; }
+  if(v > todayStr()){ el('date-picker').value=curStr(); return; }
+  state.currentDate=new Date(v+'T00:00:00'); renderAll();
+}
+function setToday(){state.currentDate=new Date();renderAll();}
+
+/* ================= STORAGE ================= */
+function save(){localStorage.setItem('challenge_mobile_suite_v1',JSON.stringify({profiles,currentProfileIdx,currentLang,currentTheme}));}
+function load(){
+  try{const raw=localStorage.getItem('challenge_mobile_suite_v1');if(raw){const o=JSON.parse(raw);if(o.profiles&&o.profiles.length){profiles=o.profiles;currentProfileIdx=o.currentProfileIdx||0;if(o.currentLang){currentLang=o.currentLang;el('lang-select').value=currentLang;}if(o.currentTheme){currentTheme=o.currentTheme;document.documentElement.setAttribute('data-theme',currentTheme);el('theme-toggle-btn').textContent=currentTheme==='dark'?'🌙':'☀️';}return;}}}catch(e){}
+  profiles=[createProfile('Challenge Suite')];currentProfileIdx=0;
+}
+
+/* ================= DATA MODEL ================= */
+function createProfile(name){
+  return{
+    name:name,
+    challenge:{name:'Challenge Suite',days:90,start:null},
+    goals:[
+      {id:'quran',name:'Quran Reading',type:'slider',target:3,unit:'pages',weight:1.5,color:'#3b82f6',days:[0,1,2,3,4,5,6],deadline:null},
+      {id:'study',name:'Study / Work',type:'slider',target:2,unit:'hours',weight:1.5,color:'#8b5cf6',days:[0,1,2,3,4,5,6],deadline:null},
+      {id:'english',name:'Language',type:'slider',target:1,unit:'hours',weight:1,color:'#ec4899',days:[0,1,2,3,4,5,6],deadline:null}
+    ],
+    customGoals:[],
+    library:DEFAULT_LIBRARY.map((n,i)=>({id:i+1,name:n[0],muscle:n[1],custom:false,img:null})),
+    programs:[{id:1,name:'Push/Pull/Legs',cycle:true,restDays:[],days:[
+      {name:'Push Day',muscles:'Chest + Triceps',exercises:['Bar Bench Press','Incline Bench Press','Tricep Pushdowns']},
+      {name:'Pull Day',muscles:'Back + Biceps',exercises:['Deadlift','Pull-ups','Barbell Curl']},
+      {name:'Legs Day',muscles:'Legs + Abs',exercises:['Squat','Leg Press','Crunches']}
+    ]}],
+    calLimit:2000,
+    data:{},
+    nextIds:{ex:100,prog:2,goal:1,meal:1}
+  };
+}
+
+/* ================= SCORE ================= */
+function getGoalValue(goal,day){
+  if(goal.type==='list'){let c=0; if(day.custom[goal.id]){for(const k in day.custom[goal.id])if(day.custom[goal.id][k])c++;} return c;}
+  if(goal.type==='toggle'){return day.custom[goal.id]===1?1:0;}
+  if(goal.id==='quran') return day.quran.pages;
+  if(goal.id==='study') return day.study;
+  if(goal.id==='english') return day.english;
+  if(goal.id==='skill') return day.skill;
+  if(day.custom[goal.id]!=null) return day.custom[goal.id];
+  return 0;
+}
+function goalActive(goal,d){return goal.days.includes(d.getDay());}
+function scoreFor(ds){
+  const p=getProfile(); const d=p.data[ds]; if(!d)return 0;
+  let totalW=0,wScore=0;
+  p.goals.forEach(g=>{if(!goalActive(g,new Date(ds)))return;totalW+=g.weight;const v=getGoalValue(g,d);let pct=Math.min(100,(v/(g.target||1))*100);wScore+=pct*g.weight;});
+  p.customGoals.forEach(g=>{if(!goalActive(g,new Date(ds)))return;totalW+=g.weight;const d2=p.data[ds];let v=d2.custom[g.id]||0;
+    const pct=g.type==='toggle'?(v?100:0):Math.min(100,(v/(g.target||1))*100);wScore+=pct*g.weight;});
+  return totalW?Math.round(wScore/totalW):0;
+}
+function scoreColor(p){if(p>=80)return'var(--green)';if(p>=50)return'var(--amber)';return'var(--red)';}
+
+/* ================= STREAKS ================= */
+function mainStreak(){
+  const dates=allDates().sort(); let s=0;
+  for(let i=dates.length-1;i>=0;i--){ if(scoreFor(dates[i])>50) s++; else break; }
+  return s;
+}
+function renderStreaks(){
+  const row=el('streak-row'); row.innerHTML='';
+  const ms=mainStreak();
+  row.innerHTML=`<div class="sbadge" style="background:var(--card);border:1px solid var(--green)">🔥 ${currentLang==='ar'?'الستريك':'Streak'}: <b style="color:var(--green)">${ms}</b></div>`;
+}
+function allDates(){return Object.keys(getProfile().data);}
+
+/* ================= TABS ================= */
+function switchTab(t){
+  state.tab=t;
+  const tabsMap=['home','prayer','quran','daily','gym','nutrition','scale','stats','settings'];
+  document.querySelectorAll('.tab').forEach((b,idx)=>b.classList.toggle('active',tabsMap[idx]===t));
+  document.querySelectorAll('.pg').forEach(p=>p.classList.toggle('active',p.id==='pg-'+t));
+  renderTab(t);
+}
+function renderTab(t){if(t==='home')renderHome();if(t==='prayer')renderPrayer();if(t==='quran')renderQuran();if(t==='daily')renderDaily();if(t==='gym')renderGym();if(t==='nutrition')renderNutrition();if(t==='scale')renderScale();if(t==='stats')renderStats();if(t==='settings')renderSettings();}
+
+/* ================= HEADER ================= */
+function updateHeader(){
+  el('challenge-name').textContent=challenge().name||t('challenge_name_default');
+  el('h-mainstreak').textContent=mainStreak();
+  el('h-score').textContent=scoreFor(curStr())+'%';
+  el('hdr-date').textContent=fmtDate(state.currentDate);
+  el('date-picker').value=curStr();
+  el('today-score').textContent=scoreFor(curStr())+'%';
+  el('today-bar').style.width=scoreFor(curStr())+'%';
+  const ch=challenge();
+  const info=el('home-deadline-info');
+  if(ch.start){ const start=new Date(ch.start); const today=new Date(); const ms=Math.floor((today-start)/86400000); const day=ms<0?0:ms+1; info.innerHTML=`<span class="chip" style="background:var(--bg2);border:1px solid var(--primary);color:var(--primary2)">🏁 Day ${day}/${ch.days}</span>`; }
+  else info.innerHTML=`<span class="chip" style="background:var(--bg2);border:1px solid var(--primary);color:var(--primary2)">Set start date in settings</span>`;
+}
+
+/* ================= HOME ================= */
+function renderHome(){
+  const box=el('home-cards'); const dd=getDay(); const cards=[];
+  const pd=Object.values(dd.prayers).filter(v=>v).length;
+  cards.push({name:'🕌 Prayer',color:'var(--green)',score:padProg(pd,5),detail:pd+'/5',goto:'prayer'});
+  cards.push({name:'📖 Quran',color:'var(--primary)',score:padProg(dd.quran.pages,3),detail:dd.quran.pages+' p',goto:'quran'});
+  cards.push({name:'🎯 Daily',color:'var(--purple)',score:padProg(dd.study,2),detail:dd.study+'h',goto:'daily'});
+  cards.push({name:'💪 Gym',color:'var(--red)',score:dd.gym.status==='done'?100:0,detail:dd.gym.status||'none',goto:'gym'});
+  const calEat=(dd.meals||[]).reduce((s,m)=>s+m.cal,0); const limit=getProfile().calLimit||0;
+  cards.push({name:'🍽 Diet',color:'var(--pink)',score:limit?padProg(calEat,limit):0,detail:calEat+' kcal',goto:'nutrition'});
+  box.innerHTML=cards.map(k=>`
+    <div class="gcard" style="border-left-color:${k.color}">
+      <div class="ghead"><span class="name">${k.name}</span><span class="val" style="color:${k.color}">${k.score}%</span></div>
+      <div class="pbar mb"><div class="pfill" style="width:${k.score}%;background:${k.color}"></div></div>
+      <div style="display:flex;justify-content:space-between;align-items:center"><span class="hint">${k.detail}</span>
+      <button class="btn b-ghost b-sm" onclick="switchTab('${k.goto}')">Open →</button></div>
+    </div>`).join('');
+}
+
+/* ================= PRAYER ================= */
+function renderPrayer(){
+  const dd=getDay(); const ro=isReadOnly(curStr());
+  el('prayer-grid').innerHTML=PRAYERS.map(p=>`<div class="pcard ${dd.prayers[p.id]?'done':''} ${ro?'readonly':''}" onclick="${ro?'':"togglePrayer('"+p.id+"')"}"><div class="pi">${p.icon}</div><div class="pn">${p.name[currentLang]}</div>${dd.prayers[p.id]?'✓':''}</div>`).join('');
+  const done=Object.values(dd.prayers).filter(v=>v).length;
+  el('prayer-val').textContent=done+'/5';
+  el('prayer-bar').style.width=(done/5*100)+'%';
+  const w=el('prayer-week'); const today=new Date(state.currentDate); const start=addDays(today,-(today.getDay())); w.innerHTML='';
+  for(let i=0;i<7;i++){const d=addDays(start,i);const ds=dateStr(d);const day=getProfile().data[ds];const cnt=day?Object.values(day.prayers).filter(v=>v).length:0;w.innerHTML+=`<div class="pcard"><div class="pn">${WEEK_EN[d.getDay()]}</div><b>${cnt}/5</b></div>`;}
+}
+function togglePrayer(id){if(isReadOnly(curStr()))return;getDay().prayers[id]=!getDay().prayers[id];save();updateHeader();renderPrayer();}
+
+/* ================= QURAN ================= */
+function renderQuran(){
+  const dd=getDay(); el('quran-pages').value=dd.quran.pages||'';
+  el('quran-val').textContent=(dd.quran.pages||0)+' pages';
+  const ch=el('quran-chart'); ch.innerHTML='';
+  for(let i=1;i<=28;i++){ch.innerHTML+=`<div class="bar-col"><div class="bar" style="height:12px;background:var(--primary)"></div><div class="bar-l">${i}</div></div>`;}
+}
+function setQuranType(t){if(isReadOnly(curStr()))return;getDay().quran.type=t;save();renderQuran();}
+function saveQuran(){
+  if(isReadOnly(curStr())){showToast('Read only');return;}
+  const dd=getDay(); dd.quran.pages=Math.max(0,parseInt(el('quran-pages').value)||0);
+  save(); updateHeader(); renderQuran(); showToast('Saved');
+}
+
+/* ================= DAILY ================= */
+function renderDaily(){
+  const dd=getDay(); const ro=isReadOnly(curStr());
+  const box=el('daily-goals'); box.innerHTML='';
+  const allG=getProfile().goals.filter(g=>g.id!=='quran').map(g=>({g:g,val:getGoalValue(g,dd)}));
+  allG.forEach(({g,val})=>{
+    div=document.createElement('div'); div.className='gcard'; div.style.borderLeftColor=g.color;
+    div.innerHTML=`<div class="ghead"><span class="name">${esc(g.name)}</span><span class="val" style="color:${g.color}">${val} / ${g.target}</span></div>
+      <input type="range" min="0" max="${g.target*2}" value="${val}" ${ro?'disabled':''} oninput="setDaily('${g.id}',this.value)" style="accent-color:${g.color}">`;
+    box.appendChild(div);
+  });
+  el('daily-notes').value=dd.notes||'';
+  el('daily-notes').disabled=ro;
+}
+function setDaily(id,v){if(isReadOnly(curStr()))return;getDay()[id]=parseFloat(v);save();updateHeader();renderDaily();}
+function saveNotes(){if(isReadOnly(curStr())){showToast('Read only');return;}getDay().notes=el('daily-notes').value;save();showToast('Saved notes');}
+
+/* ================= GYM ================= */
+function renderGym(){
+  const dd=getDay(); const ro=isReadOnly(curStr());
+  ['done','rest','missed'].forEach(s=>{const b=el('gst-'+s);b.className='gstat-btn';if(dd.gym.status===s)b.classList.add('sel-'+s);if(ro)b.disabled=true;});
+  el('gym-setup-card').classList.toggle('hidden',dd.gym.status!=='done'||ro);
+  el('gym-save-card').classList.toggle('hidden',dd.gym.status!=='done'||ro);
+  const sel=el('prog-select'); sel.innerHTML='<option value="">Routine</option>'+getProfile().programs.map((p,i)=>`<option value="${i}">${p.name}</option>`).join('');
+  const exBox=el('gym-exercises'); exBox.innerHTML='';
+  if(dd.gym.status==='done'){
+    (dd.gym.exercises||[]).forEach((ex,ei)=>exBox.appendChild(renderExercise(ex,ei)));
+  }
+}
+function renderExercise(ex,ei){
+  const div=document.createElement('div'); div.className='excard'; const ro=isReadOnly(curStr());
+  let rows=(ex.sets||[]).map((st,si)=>`<tr><td>${si+1}</td><td>${st.w}kg</td><td>${st.r}</td><td>${st.w*st.r}</td><td></td></tr>`).join('');
+  div.innerHTML=`<b>${esc(ex.name)}</b><table><thead><tr><th>#</th><th>Wt</th><th>Reps</th><th>Vol</th><th></th></tr></thead><tbody>${rows||'<tr><td colspan="5">No sets</td></tr>'}</tbody></table>
+  ${ro?'':`<div style="display:flex;gap:6px;margin-top:8px"><input type="number" placeholder="Wt" id="nw-${ei}" class="setedit"><input type="number" placeholder="Reps" id="nr-${ei}" class="setedit"><button class="btn b-green b-sm" onclick="addSet(${ei})">+</button></div>`}`;
+  return div;
+}
+function addSet(ei){if(isReadOnly(curStr()))return;const ex=getDay().gym.exercises[ei];if(!ex.sets)ex.sets=[];ex.sets.push({w:parseFloat(el('nw-'+ei).value)||0,r:parseInt(el('nr-'+ei).value)||0});save();renderGym();}
+function setGymStatus(st){if(isReadOnly(curStr()))return;getDay().gym.status=st;if(st!=='done')getDay().gym.exercises=[];save();updateHeader();renderGym();}
+function saveGymDay(){if(isReadOnly(curStr()))return;getDay().gym.saved=true;save();showToast('Saved workout');}
+function loadProgramForDay(idx){if(idx==='')return;const pr=getProfile().programs[idx];const dd=getDay();const day=pr.days[0];dd.gym.name=day.name;dd.gym.exercises=day.exercises.map(n=>({name:n,sets:[]}));save();renderGym();}
+function addGymExerciseCurrent(){const name=prompt('Exercise name:');if(!name)return;getDay().gym.exercises.push({name,sets:[]});save();renderGym();}
+
+/* ================= NUTRITION ================= */
+function renderNutrition(){
+  const dd=getDay(); const limit=getProfile().calLimit||0;
+  el('cal-limit').value=limit||'';
+  const eaten=(dd.meals||[]).reduce((s,m)=>s+m.cal,0);
+  el('cal-eaten').textContent=eaten; el('cal-target').textContent='/ '+limit+' kcal';
+  el('meals-list').innerHTML=(dd.meals||[]).map(m=>`<div class="meal-card"><b>${esc(m.name)}</b>: ${m.cal} kcal</div>`).join('')||'<div class="hint center">No meals</div>';
+}
+function addMeal(){const name=prompt('Meal name:');if(!name)return;const cal=parseInt(prompt('Calories:')||0);getDay().meals.push({name,cal,p:0,c:0,f:0});save();renderNutrition();}
+function setCalLimit(v){getProfile().calLimit=parseFloat(v)||0;save();renderNutrition();}
+
+/* ================= SCALE ================= */
+function renderScale(){
+  const dd=getDay(); el('scale-input').value=dd.weight||''; el('scale-val').textContent=dd.weight?dd.weight+'kg':'—';
+}
+function saveScale(){if(isReadOnly(curStr()))return;getDay().weight=parseFloat(el('scale-input').value)||null;save();renderScale();showToast('Saved weight');}
+
+/* ================= STATS & SETTINGS ================= */
+let calViewDate=new Date();
+function shiftCal(n){calViewDate.setMonth(calViewDate.getMonth()+n);renderCal();}
+function renderCal(){
+  const grid=el('cal-grid'); const mo=calViewDate.getMonth(),yr=calViewDate.getFullYear();
+  el('cal-month').textContent=calViewDate.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  grid.innerHTML=WEEK_EN.map(d=>`<div class="cal-h">${d[0]}</div>`).join('');
+  const first=new Date(yr,mo,1).getDay(); for(let i=0;i<first;i++)grid.innerHTML+='<div></div>';
+  const dim=new Date(yr,mo+1,0).getDate();
+  for(let day=1;day<=dim;day++){const ds=dateStr(new Date(yr,mo,day));const sc=getProfile().data[ds]?scoreFor(ds):null;grid.innerHTML+=`<div class="cal-day" style="background:${sc!=null?scoreColor(sc):'var(--card2)'};color:${sc!=null?'white':''}"><span>${day}</span></div>`;}
+}
+function renderStats(){renderCal();el('report-grid').innerHTML=`<div class="rcard"><div class="rv">${allDates().length}</div><div class="rl">Days</div></div><div class="rcard"><div class="rv">${mainStreak()}</div><div class="rl">Streak</div></div>`;el('badges-grid').innerHTML='<div class="badge earned"><div class="bi">🔥</div><div class="bn">Active</div></div>';}
+function renderSettings(){el('ch-name').value=challenge().name||'';}
+function setChallengeName(v){getProfile().challenge.name=v;save();updateHeader();}
+function setChallengeDays(v){getProfile().challenge.days=parseInt(v)||90;save();}
+function setChallengeStart(v){getProfile().challenge.start=v;save();}
+function addGoal(){const name=el('ng-name').value;if(!name)return;getProfile().customGoals.push({id:'cg_'+Date.now(),name,type:el('ng-type').value,target:parseFloat(el('ng-target').value)||1,weight:1,color:el('ng-color').value,days:[0,1,2,3,4,5,6]});save();renderSettings();showToast('Goal added');}
+function exportJSON(){const blob=new Blob([JSON.stringify(profiles)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='backup.json';a.click();}
+function importJSON(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{profiles=JSON.parse(e.target.result);save();renderAll();};r.readAsText(f);}
+function resetAll(){if(confirm('Wipe all?'))localStorage.clear();location.reload();}
+
+function renderAll(){updateDateLockUI();updateHeader();renderStreaks();renderTab(state.tab);updateTexts();}
+function showToast(msg){const t=el('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+function init(){load();updateTexts();renderAll();}
+document.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>
